@@ -1,0 +1,38 @@
+# input fastq files
+read1:
+    C4_PBMC: data/fastq/C4_PBMC_without_CD8_plus_S91_L001_R1_001.fastq.gz
+    C4_CD8: data/fastq/C4_CD8_plus_CD57_plus_S75_L001_R1_001.fastq.gz
+read2:
+    C4_PBMC: data/fastq/C4_PBMC_without_CD8_plus_S91_L001_R2_001.fastq.gz
+    C4_CD8: data/fastq/C4_CD8_plus_CD57_plus_S75_L001_R2_001.fastq.gz
+
+# project name (use to nameoutput folder)
+project: 'Donlin-LS-11035_210914'
+
+# tumor-normal pairing information
+pair:
+    C4: ['C4_PBMC','C4_CD8']
+
+# target bed file
+bed: source/S07604514_Covered.bed
+
+# cutadapt parameters
+overlap: 3
+errate: 0.1
+minlen: 50
+qscore: 10
+adapter3: AGATCGGAAGAGCACACGTCTGAACTCCAGTCAC
+adapter5: AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT
+
+# BWA parameters
+bwaidx: /data/gc-core/database/Refs/Homo_sapiens/Ensembl/GRCh38/Sequence/BWAIndex/GRCh38
+
+# Picard parameters
+refdict: /data/gc-core/database/Refs/Homo_sapiens/Ensembl/GRCh38/Sequence/WholeGenomeFasta/genome.dict
+
+
+refseq: /data/gc-core/database/Refs/Homo_sapiens/Ensembl/GRCh38/Sequence/WholeGenomeFasta/genome.fa
+
+# gene annotations
+refann: /data/gc-core/taz2008/Pipelines/RNAseq/GRCF_RNAseq_expression/source/GRCh37.biomart.txt.gz
+
