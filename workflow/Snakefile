@@ -14,7 +14,9 @@ rule all:
         trimqc=expand("results/{project}/trim_fastq_qc/{sample}_R1.trimmed_fastqc.html", project=config["project"], sample=config["read1"]),
         bam=expand("results/{project}/bwa_align/{sample}.bam", project=config["project"], sample=config["read1"]),
         markdup=expand("results/{project}/mark_dup/{sample}.markdup.bam", project=config["project"], sample=config["read1"]),
-        rawstat=expand("results/{project}/bam_qc/{sample}.raw.bam.flagstat.txt", project=config["project"], sample=config["read1"])
+        rawstat=expand("results/{project}/bam_qc/{sample}.raw.bam.flagstat.txt", project=config["project"], sample=config["read1"]),
+        cov=expand("results/{project}/base_coverage/base_coverage.txt.gz", project=config["project"]),
+        recal=expand("results/{project}/base_quality_recalibration/{sample}.markdup.recal.bam", project=config["project"], sample=config["read1"])
 
 rule rename_fastq:
     input:
@@ -94,7 +96,7 @@ rule bwa_align:
         bwaidx=config["bwaidx"]
     log:
         bwa="results/{project}/logs/bwa_align/bwa.{sample}.log",
-        picard="results/{project}/logs/bwa_align/picard.reorder.{sample}.log"
+        picard="results/{project}/logs/bwa_align/picard.sortsam.{sample}.log"
     threads: 8
     conda:
         "../envs/bwa.yaml"
@@ -156,17 +158,56 @@ rule bam_qc:
 
 rule base_coverage:
     input:
-        bam="results/{project}/mark_dup/{sample}.markdup.bam",
-        bai="results/{project}/mark_dup/{sample}.markdup.bai"
+        bam=expand("results/{project}/mark_dup/{sample}.markdup.bam", project=config["project"], sample=config["read1"]),
+        bai=expand("results/{project}/mark_dup/{sample}.markdup.bai", project=config["project"], sample=config["read1"])
     output:
-        cov="results/{project}/base_coverage/{sample}.base_coverage.txt.gz",
-        sumcov="results/{project}/base_coverage/{sample}.base_coverage.summary.txt"
+        cov="results/{project}/base_coverage/base_coverage.txt.gz"
     params:
         bed=config["bed"]
     log:
-        "results/{project}/logs/base_coverage/{sample}.log"
+        "results/{project}/logs/base_coverage/samtools.depth.log"
+    threads: 8
     conda:
-        "../envs/python.yaml"
-    script:
-        "../scripts/review_base_coverage.py"
+        "../envs/bwa.yaml"
+    shell:
+        "samtools depth -a -d 0 -Q 1 -@ {threads} -b {params.bed} {input.bam} >results/{project}/base_coverage/base_coverage.txt 2>{log}; "
+        "gzip results/{project}/base_coverage/base_coverage.txt; "
+
+#rule review_base_coverage:
+#    input:
+#        cov="results/{project}/base_coverage/{sample}.base_coverage.txt.gz"
+#    output:
+#        cov="results/{project}/base_coverage/{sample}.base_coverage.with_missing_bases.txt.gz",
+#        sumcov="results/{project}/review_base_coverage/{sample}.base_coverage.summary.txt"
+#    params:
+#        bed=config["bed"]
+#    log:
+#        "results/{project}/logs/summarize_base_coverage/{sample}.log"
+#    conda:
+#        "../envs/python.yaml"
+#    script:
+#        "../scripts/review_base_coverage.py"
+
+rule base_quality_recalibration:
+    input:
+        bam="results/{project}/mark_dup/{sample}.markdup.bam",
+        bai="results/{project}/mark_dup/{sample}.markdup.bai"
+    output:
+        tmp=temp(directory("results/{project}/base_quality_recalibration/tmp{sample}")),
+        recal="results/{project}/base_quality_recalibration/{sample}.recal_data.table",
+        bam="results/{project}/base_quality_recalibration/{sample}.markdup.recal.bam"
+    params:
+        refseq=config["refseq"],
+        snpdb=config["snpdb"]
+    resources:
+        mem_mb=16000
+    log:
+        br="results/{project}/logs/base_quality_recalibration/gatk.BaseRecalibrator.{sample}.log",
+        ab="results/{project}/logs/base_quality_recalibration/gatk.ApplyBQSR.{sample}.log"
+    conda:
+        "../envs/gatk.yaml"
+    shell:
+        """mkdir -p {output.tmp}; """
+        """gatk BaseRecalibrator --tmp-dir {output.tmp}  -I {input.bam} -R {params.refseq} --known-sites {params.snpdb} -O {output.recal} >{log.br} 2>&1; """
+        """gatk ApplyBQSR --tmp-dir {output.tmp} -R {params.refseq}  -I {input.bam} --bqsr-recal-file {output.recal} -O {output.bam} >{log.ab} 2>&1; """
 
