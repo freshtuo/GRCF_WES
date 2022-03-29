@@ -1,12 +1,21 @@
 configfile: "config/config.yaml"
 
+project=config["project"]
+
 def get_read1_file(wildcards):
     return config["read1"][wildcards.sample]
 
 def get_read2_file(wildcards):
     return config["read2"][wildcards.sample]
 
-project=config["project"]
+def get_normal_bam(wildcards):
+    return "results/{}/base_quality_recalibration/{}.markdup.recal.bam".format(project, config["pair"][wildcards.pair][0])
+
+def get_tumor_bam(wildcards):
+    return "results/{}/base_quality_recalibration/{}.markdup.recal.bam".format(project, config["pair"][wildcards.pair][1])
+
+def get_normal_vcfs(wildcards):
+    return " ".join(["-V results/{}/mutect_variant_calling_normal/{}/{}.vcf.gz".format(project, normal, normal) for normal in config["normal"]])
 
 rule all:
     input:
@@ -16,7 +25,12 @@ rule all:
         markdup=expand("results/{project}/mark_dup/{sample}.markdup.bam", project=config["project"], sample=config["read1"]),
         rawstat=expand("results/{project}/bam_qc/{sample}.raw.bam.flagstat.txt", project=config["project"], sample=config["read1"]),
         cov=expand("results/{project}/base_coverage/base_coverage.txt.gz", project=config["project"]),
-        recal=expand("results/{project}/base_quality_recalibration/{sample}.markdup.recal.bam", project=config["project"], sample=config["read1"])
+        recal=expand("results/{project}/base_quality_recalibration/{sample}.markdup.recal.bam", project=config["project"], sample=config["read1"]),
+        rawvcf=expand("results/{project}/mutect_variant_calling/{pair}/{pair}.raw.vcf.gz", project=config["project"], pair=config["pair"]),
+        filtvcf=expand("results/{project}/filter_mutect_calls/{pair}/{pair}.filtered.vcf.gz", project=config["project"], pair=config["pair"]),
+        #nvcf=expand("results/{project}/mutect_variant_calling_normal/{normal}/{normal}.vcf.gz", project=config["project"], normal=config["normal"]),
+        #db=directory(expand("results/{project}/create_genomicsdb_normal/pon_db", project=config["project"])),
+        pon=expand("results/{project}/create_panel_of_normals/pon.vcf.gz", project=config["project"])
 
 rule rename_fastq:
     input:
@@ -210,4 +224,190 @@ rule base_quality_recalibration:
         """mkdir -p {output.tmp}; """
         """gatk BaseRecalibrator --tmp-dir {output.tmp}  -I {input.bam} -R {params.refseq} --known-sites {params.snpdb} -O {output.recal} >{log.br} 2>&1; """
         """gatk ApplyBQSR --tmp-dir {output.tmp} -R {params.refseq}  -I {input.bam} --bqsr-recal-file {output.recal} -O {output.bam} >{log.ab} 2>&1; """
+
+rule mutect_variant_calling:
+    input:
+        normal=get_normal_bam,
+        tumor=get_tumor_bam,
+        pon="results/{project}/create_panel_of_normals/pon.vcf.gz"
+    output:
+        tmp=temp(directory("results/{project}/mutect_variant_calling/tmp{pair}")),
+        roa="results/{project}/mutect_variant_calling/{pair}/{pair}.f1r2.tar.gz",
+        vcf="results/{project}/mutect_variant_calling/{pair}/{pair}.raw.vcf.gz"
+    params:
+        refseq=config["refseq"],
+        gnomad=config["gnomad"],
+        bed=config["bed"]
+    resources:
+        mem_mb=16000
+    threads: 8
+    log:
+        "results/{project}/logs/mutect_variant_calling/gatk.mutect2.{pair}.log"
+    conda:
+        "../envs/gatk.yaml"
+    shell:
+        """x=`basename {input.normal}`; """
+        """sid=${{x%.markdup.recal.bam}}; """
+        """mkdir -p {output.tmp}; """
+        """gatk Mutect2 --tmp-dir {output.tmp} -R {params.refseq} """
+        """-I {input.tumor} -I {input.normal} -normal ${{sid}} -L {params.bed} """
+        """--panel-of-normals {input.pon} --germline-resource {params.gnomad} --f1r2-tar-gz {output.roa} -O {output.vcf} >{log} 2>&1; """
+
+# LearnReadOrientationModel
+rule learn_read_orientation_model:
+    input:
+        roa="results/{project}/mutect_variant_calling/{pair}/{pair}.f1r2.tar.gz"
+    output:
+        tmp=temp(directory("results/{project}/learn_read_orientation_model/tmp{pair}")),
+        mdl="results/{project}/learn_read_orientation_model/{pair}/{pair}.read-orientation-model.tar.gz"
+    resources:
+        mem_mb=12000
+    threads: 4
+    log:
+        "results/{project}/logs/learn_read_orientation_model/gatk.learnreadorientationmodel.{pair}.log"
+    conda:
+        "../envs/gatk.yaml"
+    shell:
+        """mkdir -p {output.tmp}; """
+        """gatk LearnReadOrientationModel --tmp-dir {output.tmp} -I {input.roa} -O {output.mdl} >{log} 2>&1; """
+
+# Run GetPileupSummaries to summarize read support for a set number of known variant sites.
+rule get_pileup_summaries:
+    input:
+        normal=get_normal_bam,
+        tumor=get_tumor_bam
+    output:
+        tmp=temp(directory("results/{project}/get_pileup_summaries/tmp{pair}")),
+        normal="results/{project}/get_pileup_summaries/{pair}/{pair}.normal.pileups.table",
+        tumor="results/{project}/get_pileup_summaries/{pair}/{pair}.tumor.pileups.table"
+    params:
+        exac=config["exac"]
+    resources:
+        mem_mb=16000
+    threads: 4
+    log:
+        normal="results/{project}/logs/get_pileup_summaries/gatk.getpileupsummaries.{pair}.normal.log",
+        tumor="results/{project}/logs/get_pileup_summaries/gatk.getpileupsummaries.{pair}.tumor.log"
+    conda:
+        "../envs/gatk.yaml"
+    shell:
+        """mkdir -p {output.tmp}; """
+        """gatk GetPileupSummaries --tmp-dir {output.tmp} -I {input.normal} """
+        """-V {params.exac} -L {params.exac} -O {output.normal} >{log.normal} 2>&1; """
+        """gatk GetPileupSummaries --tmp-dir {output.tmp} -I {input.tumor} """
+        """-V {params.exac} -L {params.exac} -O {output.tumor} >{log.tumor} 2>&1; """
+
+# Estimate contamination with CalculateContamination.
+rule estimate_contamination:
+    input:
+        normal="results/{project}/get_pileup_summaries/{pair}/{pair}.normal.pileups.table",
+        tumor="results/{project}/get_pileup_summaries/{pair}/{pair}.tumor.pileups.table"
+    output:
+        tmp=temp(directory("results/{project}/estimate_contamination/tmp{pair}")),
+        seg="results/{project}/estimate_contamination/{pair}/{pair}.segments.tsv",
+        ctm="results/{project}/estimate_contamination/{pair}/{pair}.contamination.table"
+    resources:
+        mem_mb=16000
+    threads: 4
+    log:
+        "results/{project}/logs/estimate_contamination/gatk.estimatecontamination.{pair}.log"
+    conda:
+        "../envs/gatk.yaml"
+    shell:
+        """mkdir -p {output.tmp}; """
+        """gatk CalculateContamination --tmp-dir {output.tmp} """
+        """-I {input.tumor} -matched {input.normal} """
+        """-tumor-segmentation {output.seg} -O {output.ctm} >{log} 2>&1; """
+
+# pass the learned read orientation model to FilterMutectCallswith the -ob-priors argument
+rule filter_mutect_calls:
+    input:
+        vcf="results/{project}/mutect_variant_calling/{pair}/{pair}.raw.vcf.gz",
+        seg="results/{project}/estimate_contamination/{pair}/{pair}.segments.tsv",
+        ctm="results/{project}/estimate_contamination/{pair}/{pair}.contamination.table",
+        mdl="results/{project}/learn_read_orientation_model/{pair}/{pair}.read-orientation-model.tar.gz"
+    output:
+        tmp=temp(directory("results/{project}/filter_mutect_calls/tmp{pair}")),
+        vcf="results/{project}/filter_mutect_calls/{pair}/{pair}.filtered.vcf.gz"
+    params:
+        refseq=config["refseq"]
+    resources:
+        mem_mb=16000
+    threads: 4
+    log:
+        "results/{project}/logs/filter_mutect_calls/gatk.filtermutectcalls.{pair}.log"
+    conda:
+        "../envs/gatk.yaml"
+    shell:
+        """mkdir -p {output.tmp}; """
+        """gatk FilterMutectCalls --tmp-dir {output.tmp} """
+        """-R {params.refseq} -V {input.vcf} --tumor-segmentation {input.seg} --contamination-table {input.ctm} """
+        """--ob-priors {input.mdl} -O {output.vcf} >{log} 2>&1; """
+
+# Run Mutect2 in tumor-only mode for each normal sample, for creating PON
+rule mutect_variant_calling_normal:
+    input:
+        bam="results/{project}/base_quality_recalibration/{normal}.markdup.recal.bam"
+    output:
+        tmp=temp(directory("results/{project}/mutect_variant_calling_normal/tmp{normal}")),
+        vcf="results/{project}/mutect_variant_calling_normal/{normal}/{normal}.vcf.gz"
+    params:
+        refseq=config["refseq"],
+        bed=config["bed"]
+    resources:
+        mem_mb=16000
+    threads: 4
+    log:
+        "results/{project}/logs/mutect_variant_calling_normal/gatk.mutect2.{normal}.log"
+    conda:
+        "../envs/gatk.yaml"
+    shell:
+        """mkdir -p {output.tmp}; """
+        """gatk Mutect2 --tmp-dir {output.tmp} -R {params.refseq} """
+        """-I {input.bam} -max-mnp-distance 0 -L {params.bed} """
+        """-O {output.vcf} >{log} 2>&1; """
+
+# Create a GenomicsDB from the normal Mutect2 calls.
+rule create_genomicsdb_normal:
+    input:
+        vcf=expand("results/{project}/mutect_variant_calling_normal/{normal}/{normal}.vcf.gz", project=config["project"], normal=config["normal"])
+    output:
+        tmp=temp(directory("results/{project}/create_genomicsdb_normal/tmp")),
+        db=temp(directory("results/{project}/create_genomicsdb_normal/pon_db"))
+    params:
+        refseq=config["refseq"],
+        bed=config["bed"],
+        vcf=get_normal_vcfs
+    resources:
+        mem_mb=12000
+    threads: 4
+    log:
+        "results/{project}/logs/create_genomicsdb_normal/gatk.genomicsdbimport.normal.log"
+    conda:
+        "../envs/gatk.yaml"
+    shell:
+        """mkdir -p {output.tmp}; """
+        """gatk GenomicsDBImport --tmp-dir {output.tmp} -R {params.refseq} -L {params.bed} """
+        """--genomicsdb-workspace-path {output.db} --merge-input-intervals {params.vcf} >{log} 2>&1; """
+
+# Combine the normal calls using CreateSomaticPanelOfNormals.
+rule create_panel_of_normals:
+    input:
+        db="results/{project}/create_genomicsdb_normal/pon_db"
+    output:
+        tmp=temp(directory("results/{project}/create_panel_of_normals/tmp")),
+        vcf="results/{project}/create_panel_of_normals/pon.vcf.gz"
+    params:
+        refseq=config["refseq"],
+        gnomad=config["gnomad"]
+    resources:
+        mem_mb=12000
+    threads: 4
+    log:
+        "results/{project}/logs/create_panel_of_normals/gatk.createsomaticpanelofnormals.log"
+    conda:
+        "../envs/gatk.yaml"
+    shell:
+        """mkdir -p {output.tmp}; """
+        """gatk CreateSomaticPanelOfNormals -R {params.refseq} -V gendb://{input.db} -O {output.vcf} >{log} 2>&1; """
 
