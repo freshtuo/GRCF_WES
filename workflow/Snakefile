@@ -17,6 +17,15 @@ def get_tumor_bam(wildcards):
 def get_normal_vcfs(wildcards):
     return " ".join(["-V results/{}/mutect_variant_calling_normal/{}/{}.vcf.gz".format(project, normal, normal) for normal in config["normal"]])
 
+def get_normal_id(wildcards):
+    return "{}".format(config["pair"][wildcards.pair][0])
+
+def get_tumor_id(wildcards):
+    return "{}".format(config["pair"][wildcards.pair][1])
+
+def get_target_enrich_tempdir(wildcards):
+    return "results/{}/review_target_enrichment/tmp".format(project)
+
 rule all:
     input:
         rawqc=expand("results/{project}/raw_fastq_qc/{sample}_R1_fastqc.html", project=config["project"], sample=config["read1"]),
@@ -30,7 +39,13 @@ rule all:
         filtvcf=expand("results/{project}/filter_mutect_calls/{pair}/{pair}.filtered.vcf.gz", project=config["project"], pair=config["pair"]),
         #nvcf=expand("results/{project}/mutect_variant_calling_normal/{normal}/{normal}.vcf.gz", project=config["project"], normal=config["normal"]),
         #db=directory(expand("results/{project}/create_genomicsdb_normal/pon_db", project=config["project"])),
-        pon=expand("results/{project}/create_panel_of_normals/pon.vcf.gz", project=config["project"])
+        funco=expand("results/{project}/funcotator_annotate_variants/{pair}/{pair}.funcotated.vcf.gz", project=config["project"], pair=config["pair"]),
+        pon=expand("results/{project}/create_panel_of_normals/pon.vcf.gz", project=config["project"]),
+        #enrich=expand("results/{project}/review_target_enrichment/{sample}/enrichment.{sample}.txt", project=config["project"], sample=config["read1"])
+        #enrich=expand("results/{project}/review_target_enrichment/C4_PBMC/enrichment.C4_PBMC.txt", project=config["project"])
+        enrich=expand("results/{project}/review_target_enrichment/target_enrichment.png", project=config["project"]),
+        report=expand("results/{project}/mafs_to_excel/variants.xlsx", project=config["project"]),
+        covsum=expand("results/{project}/review_base_coverage/base.coverage.sumamry.xlsx", project=config["project"])
 
 rule rename_fastq:
     input:
@@ -159,7 +174,8 @@ rule bam_qc:
         insm="results/{project}/bam_qc/{sample}.insert_size_metrics.txt",
         insp="results/{project}/bam_qc/{sample}.insert_size_histogram.pdf"
     resources:
-        mem_mb=16000
+        mem_mb=16000,
+        tmpdir="results/{project}/bam_qc/tmp{sample}"
     log:
         samtools="results/{project}/logs/bam_qc/samtools.{sample}.log",
         picard="results/{project}/logs/bam_qc/picard.insertsize.{sample}.log"
@@ -178,6 +194,8 @@ rule base_coverage:
         cov="results/{project}/base_coverage/base_coverage.txt.gz"
     params:
         bed=config["bed"]
+    resources:
+        tmpdir="results/{project}/base_coverage"
     log:
         "results/{project}/logs/base_coverage/samtools.depth.log"
     threads: 8
@@ -187,20 +205,62 @@ rule base_coverage:
         "samtools depth -a -d 0 -Q 1 -@ {threads} -b {params.bed} {input.bam} >results/{project}/base_coverage/base_coverage.txt 2>{log}; "
         "gzip results/{project}/base_coverage/base_coverage.txt; "
 
-#rule review_base_coverage:
+rule review_base_coverage:
+    input:
+        cov="results/{project}/base_coverage/base_coverage.txt.gz"
+    output:
+        report="results/{project}/review_base_coverage/base.coverage.sumamry.xlsx",
+        tempbed=temp("results/{project}/review_base_coverage/lowcov.bases.bed"),
+        lowcov="results/{project}/review_base_coverage/low.coverage.regions.bed"
+    params:
+        bed=config["bed"]
+    log:
+        "results/{project}/logs/review_base_coverage/review_base_coverage.log"
+    conda:
+        "../envs/python.yaml"
+    script:
+        "../scripts/review_base_coverage.py"
+
+#rule review_target_enrichment:
 #    input:
-#        cov="results/{project}/base_coverage/{sample}.base_coverage.txt.gz"
+#        bam="results/{project}/mark_dup/{sample}.markdup.bam",
+#        bai="results/{project}/mark_dup/{sample}.markdup.bai"
 #    output:
-#        cov="results/{project}/base_coverage/{sample}.base_coverage.with_missing_bases.txt.gz",
-#        sumcov="results/{project}/review_base_coverage/{sample}.base_coverage.summary.txt"
+#        report="results/{project}/review_target_enrichment/{sample}/enrichment.{sample}.txt"
 #    params:
 #        bed=config["bed"]
+#    resources:
+#        tmpdir="results/{project}/review_target_enrichment/tmp{sample}"
 #    log:
-#        "results/{project}/logs/summarize_base_coverage/{sample}.log"
+#        "results/{project}/logs/review_target_enrichment/{sample}.log",
+#        "results/{project}/logs/review_target_enrichment/{sample}.msg"
 #    conda:
 #        "../envs/python.yaml"
 #    script:
-#        "../scripts/review_base_coverage.py"
+#        "../scripts/review_target_enrichment.py"
+
+rule review_target_enrichment:
+    input:
+        bam=expand("results/{project}/mark_dup/{sample}.markdup.bam", project=config["project"], sample=config["read1"]),
+        bai=expand("results/{project}/mark_dup/{sample}.markdup.bai", project=config["project"], sample=config["read1"])
+    output:
+        txt="results/{project}/review_target_enrichment/target_enrichment.txt",
+        plot="results/{project}/review_target_enrichment/target_enrichment.png"
+    params:
+        bed=config["bed"],
+        pw=config["plotwidth"],
+        ph=config["plotheight"]
+    resources:
+        tmpdir=get_target_enrich_tempdir
+    log:
+        "results/{project}/logs/review_target_enrichment/deeptools.plotenrichment.log"
+    threads: 16
+    conda:
+        "../envs/deeptools.yaml"
+    shell:
+        """plotEnrichment -b {input.bam} --BED {params.bed} --regionLabels "reads on target" """
+        """-o {output.plot} --outRawCounts {output.txt} -p {threads} --smartLabels """
+        """--plotHeight {params.ph} --plotWidth {params.pw} >{log} 2>&1; """
 
 rule base_quality_recalibration:
     input:
@@ -409,5 +469,53 @@ rule create_panel_of_normals:
         "../envs/gatk.yaml"
     shell:
         """mkdir -p {output.tmp}; """
-        """gatk CreateSomaticPanelOfNormals -R {params.refseq} -V gendb://{input.db} -O {output.vcf} >{log} 2>&1; """
+        """gatk CreateSomaticPanelOfNormals --tmp-dir {output.tmp} -R {params.refseq} -V gendb://{input.db} -O {output.vcf} >{log} 2>&1; """
+
+# Annotate variants using Funcotator.
+rule funcotator_annotate_variants:
+    input:
+        vcf="results/{project}/filter_mutect_calls/{pair}/{pair}.filtered.vcf.gz"
+    output:
+        tmp=temp(directory("results/{project}/funcotator_annotate_variants/tmp{pair}")),
+        vcf="results/{project}/funcotator_annotate_variants/{pair}/{pair}.funcotated.vcf.gz",
+        maftmp=temp("results/{project}/funcotator_annotate_variants/{pair}/{pair}.funcotated.maf"),
+        maf="results/{project}/funcotator_annotate_variants/{pair}/{pair}.funcotated.maf.gz"
+    params:
+        refseq=config["refseq"],
+        funco=config["funco"],
+        refver=config["refver"],
+        normal=get_normal_id,
+        tumor=get_tumor_id
+    resources:
+        mem_mb=8000
+    threads: 2
+    log:
+        vcf="results/{project}/logs/funcotator_annotate_variants/gatk.funcotator.{pair}.vcf.log",
+        maf="results/{project}/logs/funcotator_annotate_variants/gatk.funcotator.{pair}.maf.log"
+    conda:
+        "../envs/gatk.yaml"
+    shell:
+        """mkdir -p {output.tmp}; """
+        """gatk Funcotator --tmp-dir {output.tmp} -R {params.refseq} -V {input.vcf} """
+        """-O {output.vcf} --output-file-format VCF --ref-version {params.refver} """
+        """--data-sources-path {params.funco} --remove-filtered-variants False >{log.vcf} 2>&1; """
+        """gatk Funcotator --tmp-dir {output.tmp} -R {params.refseq} -V {input.vcf} """
+        """-O {output.maftmp} --output-file-format MAF --ref-version {params.refver} """
+        """--data-sources-path {params.funco} --remove-filtered-variants True """
+        """--annotation-default Center:grcf --annotation-default Tumor_Sample_Barcode:{params.tumor} """
+        """--annotation-default Matched_Norm_Sample_Barcode:{params.normal} >{log.maf} 2>&1; """
+        """gzip {output.maftmp}; zcat {output.maf} >{output.maftmp}; """
+
+# Combine MAFs and write to an excel file
+rule mafs_to_excel:
+    input:
+        maf=expand("results/{project}/funcotator_annotate_variants/{pair}/{pair}.funcotated.maf.gz", project=config["project"], pair=config["pair"])
+    output:
+        report="results/{project}/mafs_to_excel/variants.xlsx"
+    log:
+        "results/{project}/logs/mafs_to_excel/combine_mafs.log"
+    conda:
+        "../envs/python.yaml"
+    script:
+        "../scripts/mafs_to_excel.py"
 
