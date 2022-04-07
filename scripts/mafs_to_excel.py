@@ -70,7 +70,7 @@ def combine_maf(maf_files, out_file, columns_to_keep):
             nrows, ncols = maf.shape
             for k in range(0, ncols):
                 worksheet.set_column(k, k, 18)
-            worksheet.freeze_panes(1,13)
+            worksheet.freeze_panes(1,14)
 
 def check_columns(maf, columns_to_keep):
         missing = []
