@@ -92,7 +92,8 @@ pair:
     M109: ['M109_PBMC','M109_CD8']
 
 # normal samples
-normal: ['C4_PBMC','C5_PBMC','C6_PBMC','C7_PBMC','C8_PBMC','M27-2_PBMC','M37-2_PBMC','M39-2_PBMC','M40-2_PBMC','M46_PBMC','M49-2_PBMC','M52_PBMC','M61-1_PBMC','M61_Muscle_PBMC','M102_PBMC','M109_PBMC']
+##normal: ['C4_PBMC','C5_PBMC','C6_PBMC','C7_PBMC','C8_PBMC','M27-2_PBMC','M37-2_PBMC','M39-2_PBMC','M40-2_PBMC','M46_PBMC','M49-2_PBMC','M52_PBMC','M61-1_PBMC','M61_Muscle_PBMC','M102_PBMC','M109_PBMC']
+normal: ['C4_PBMC','C5_PBMC','C6_PBMC','C7_PBMC','C8_PBMC']
 
 # target bed file
 #bed: source/bed/S07604514_Covered.GRCh38.bed
@@ -119,6 +120,7 @@ refdict: /data/gc-core/yit2001/Refs/Homo_sapiens/UCSC/hg38/Sequence/WholeGenomeF
 refver: hg38
 
 # GATK
+# dbsnp
 snpdb: /data/gc-core/yit2001/Refs/Homo_sapiens/UCSC/hg38/resource/Homo_sapiens_assembly38.dbsnp138.vcf
 
 #refseq: /data/gc-core/database/Refs/Homo_sapiens/Ensembl/GRCh38/Sequence/WholeGenomeFasta/genome.fa
@@ -132,6 +134,10 @@ exac: /data/gc-core/yit2001/Refs/Homo_sapiens/UCSC/hg38/resource/small_exac_comm
 
 # funcotator data sources path
 funco: /data/gc-core/yit2001/Refs/Homo_sapiens/UCSC/hg38/resource/funcotator_dataSources.v1.7.20200521s/
+
+# MAF remove filtered variants?
+#mafilt: True
+mafilt: False
 
 # MAF columns to write
 cols: ['Hugo_Symbol','Entrez_Gene_Id','Center','NCBI_Build','Chromosome','Start_Position','End_Position','Strand','Variant_Classification','Variant_Type','Reference_Allele','Tumor_Seq_Allele1','Tumor_Seq_Allele2','dbSNP_RS','dbSNP_Val_Status','Tumor_Sample_Barcode','Matched_Norm_Sample_Barcode','Genome_Change','Annotation_Transcript','Transcript_Strand','Transcript_Exon','Transcript_Position','cDNA_Change','Codon_Change','Protein_Change','Other_Transcripts','Refseq_mRNA_Id','Refseq_prot_Id','SwissProt_acc_Id','SwissProt_entry_Id','Description','GO_Biological_Process','GO_Cellular_Component','GO_Molecular_Function','COSMIC_overlapping_mutations','COSMIC_fusion_genes','COSMIC_tissue_types_affected','COSMIC_total_alterations_in_gene','DrugBank','ref_context','gc_content','tumor_f','t_alt_count','t_ref_count','n_alt_count','n_ref_count']

@@ -50,7 +50,7 @@ def load_maf(maf_file):
     logging.info('{} header lines to skip.'.format(skip))
     # load MAF file
     maf = pd.read_table(maf_file, header=0, sep='\t', skiprows=skip)
-    logging.info('{} passing-filter variants detected.'.format(maf.shape[0]))
+    logging.info('{} variants detected.'.format(maf.shape[0]))
     # clean MAF columns
     return maf
 
