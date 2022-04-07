@@ -293,7 +293,8 @@ rule mutect_variant_calling:
     output:
         tmp=temp(directory("results/{project}/mutect_variant_calling/tmp{pair}")),
         roa="results/{project}/mutect_variant_calling/{pair}/{pair}.f1r2.tar.gz",
-        vcf="results/{project}/mutect_variant_calling/{pair}/{pair}.raw.vcf.gz"
+        vcf="results/{project}/mutect_variant_calling/{pair}/{pair}.raw.vcf.gz",
+        bam="results/{project}/mutect_variant_calling/{pair}/{pair}.reassembled.bam"
     params:
         refseq=config["refseq"],
         gnomad=config["gnomad"],
@@ -311,7 +312,8 @@ rule mutect_variant_calling:
         """mkdir -p {output.tmp}; """
         """gatk Mutect2 --tmp-dir {output.tmp} -R {params.refseq} """
         """-I {input.tumor} -I {input.normal} -normal ${{sid}} -L {params.bed} """
-        """--panel-of-normals {input.pon} --germline-resource {params.gnomad} --f1r2-tar-gz {output.roa} -O {output.vcf} >{log} 2>&1; """
+        """--panel-of-normals {input.pon} --germline-resource {params.gnomad} --f1r2-tar-gz {output.roa} """
+        """-bamout {output.bam} -O {output.vcf} >{log} 2>&1; """
 
 # LearnReadOrientationModel
 rule learn_read_orientation_model:
@@ -484,6 +486,7 @@ rule funcotator_annotate_variants:
         refseq=config["refseq"],
         funco=config["funco"],
         refver=config["refver"],
+        mafilt=config["mafilt"],
         normal=get_normal_id,
         tumor=get_tumor_id
     resources:
@@ -501,7 +504,7 @@ rule funcotator_annotate_variants:
         """--data-sources-path {params.funco} --remove-filtered-variants False >{log.vcf} 2>&1; """
         """gatk Funcotator --tmp-dir {output.tmp} -R {params.refseq} -V {input.vcf} """
         """-O {output.maftmp} --output-file-format MAF --ref-version {params.refver} """
-        """--data-sources-path {params.funco} --remove-filtered-variants True """
+        """--data-sources-path {params.funco} --remove-filtered-variants {params.mafilt} """
         """--annotation-default Center:grcf --annotation-default Tumor_Sample_Barcode:{params.tumor} """
         """--annotation-default Matched_Norm_Sample_Barcode:{params.normal} >{log.maf} 2>&1; """
         """gzip {output.maftmp}; zcat {output.maf} >{output.maftmp}; """
