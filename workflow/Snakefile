@@ -14,6 +14,12 @@ def get_normal_bam(wildcards):
 def get_tumor_bam(wildcards):
     return "results/{}/base_quality_recalibration/{}.markdup.recal.bam".format(project, config["pair"][wildcards.pair][1])
 
+def get_normal_bai(wildcards):
+    return "results/{}/base_quality_recalibration/{}.markdup.recal.bai".format(project, config["pair"][wildcards.pair][0])
+
+def get_tumor_bai(wildcards):
+    return "results/{}/base_quality_recalibration/{}.markdup.recal.bai".format(project, config["pair"][wildcards.pair][1])
+
 def get_normal_vcfs(wildcards):
     return " ".join(["-V results/{}/mutect_variant_calling_normal/{}/{}.vcf.gz".format(project, normal, normal) for normal in config["normal"]])
 
@@ -51,7 +57,8 @@ rule all:
         #enrich=expand("results/{project}/review_target_enrichment/C4_PBMC/enrichment.C4_PBMC.txt", project=config["project"])
         enrich=expand("results/{project}/review_target_enrichment/target_enrichment.png", project=config["project"]),
         report=expand("results/{project}/mafs_to_excel/variants.xlsx", project=config["project"]),
-        covsum=expand("results/{project}/review_base_coverage/base.coverage.sumamry.xlsx", project=config["project"])
+        covsum=expand("results/{project}/review_base_coverage/base.coverage.sumamry.xlsx", project=config["project"]),
+        cnvcall=expand("results/{project}/cnvkit_copy_number_calling/{pair}/{pair}.call.cns", project=config["project"], pair=config["pair"])
 
 rule rename_fastq:
     input:
@@ -527,4 +534,55 @@ rule mafs_to_excel:
         "../envs/python.yaml"
     script:
         "../scripts/mafs_to_excel.py"
+
+# call copy number variations with CNVkit
+rule cnvkit_copy_number_calling:
+    input:
+        normalbam=get_normal_bam,
+        tumorbam=get_tumor_bam,
+        normalbai=get_normal_bai,
+        tumorbai=get_tumor_bai
+    output:
+        folder=directory("results/{project}/cnvkit_copy_number_calling/{pair}"),
+        ref="results/{project}/cnvkit_copy_number_calling/{pair}/reference.cnn",
+        call="results/{project}/cnvkit_copy_number_calling/{pair}/{pair}.call.cns",
+        cnr="results/{project}/cnvkit_copy_number_calling/{pair}/{pair}.cnr",
+        cns="results/{project}/cnvkit_copy_number_calling/{pair}/{pair}.cns",
+        diagram="results/{project}/cnvkit_copy_number_calling/{pair}/{pair}-diagram.pdf",
+        scatter="results/{project}/cnvkit_copy_number_calling/{pair}/{pair}-scatter.png"
+    params:
+        refseq=config["refseq"],
+        bed=config["bed"]
+    resources:
+        mem_mb=16000
+    threads: 4
+    log:
+        "results/{project}/logs/cnvkit_copy_number_calling/cnvkit.{pair}.log"
+    conda:
+        "../envs/cnvkit.yaml"
+    shell:
+        """touch {input.normalbai}; """
+        """touch {input.tumorbai}; """
+        """refseq=`basename {params.refseq}`; """
+        """cd {output.folder}; """
+        """ln {params.refseq} ${{refseq}}; """
+        """ln {params.refseq}.fai ${{refseq}}.fai; """
+        """touch ${{refseq}}.fai; """
+        """cnvkit.py batch {input.tumorbam} """
+        """--normal {input.normalbam} """
+        """--targets {params.bed} """
+        """--fasta {output.folder}/${{refseq}} """
+        """--output-dir {output.folder} """
+        """--processes {threads} """
+        """--short-names """
+        """--scatter --diagram """
+        """>{log} 2>&1; """
+        """x=`basename {input.tumorbam}`; """
+        """tid=${{x%.markdup.recal.bam}}; """
+        """mv ${{tid}}.markdup.call.cns {output.call}; """
+        """mv ${{tid}}.markdup.cnr {output.cnr}; """
+        """mv ${{tid}}.markdup.cns {output.cns}; """
+        """mv ${{tid}}.markdup-diagram.pdf {output.diagram}; """
+        """mv ${{tid}}.markdup-scatter.png {output.scatter}; """
+        """rm {output.folder}/${{refseq}}*; """
 
