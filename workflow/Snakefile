@@ -26,6 +26,12 @@ def get_tumor_id(wildcards):
 def get_target_enrich_tempdir(wildcards):
     return "results/{}/review_target_enrichment/tmp".format(project)
 
+def get_bam_qc_tempdir(wildcards):
+    return "results/{}/bam_qc/tmp{}".format(project, wildcards.sample)
+
+def get_base_coverage_tempdir(wildcards):
+    return "results/{}/base_coverage".format(project)
+
 rule all:
     input:
         rawqc=expand("results/{project}/raw_fastq_qc/{sample}_R1_fastqc.html", project=config["project"], sample=config["read1"]),
@@ -175,7 +181,7 @@ rule bam_qc:
         insp="results/{project}/bam_qc/{sample}.insert_size_histogram.pdf"
     resources:
         mem_mb=16000,
-        tmpdir="results/{project}/bam_qc/tmp{sample}"
+        tmpdir=get_bam_qc_tempdir
     log:
         samtools="results/{project}/logs/bam_qc/samtools.{sample}.log",
         picard="results/{project}/logs/bam_qc/picard.insertsize.{sample}.log"
@@ -195,7 +201,7 @@ rule base_coverage:
     params:
         bed=config["bed"]
     resources:
-        tmpdir="results/{project}/base_coverage"
+        tmpdir=get_base_coverage_tempdir
     log:
         "results/{project}/logs/base_coverage/samtools.depth.log"
     threads: 8
