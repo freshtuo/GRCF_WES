@@ -1,104 +1,28 @@
 # input fastq files
 read1:
-    C4_PBMC: /gc-archive2/gc5-backup/GRCF_data_archive/NovaSeq6000/210914_A00814_0484_AHHKLFDSX2/Unaligned_1/Donlin-LS-11035_2021_09_14/17/C4_PBMC_without_CD8_plus_S91_L001_R1_001.fastq.gz
-    C4_CD8: /gc-archive2/gc5-backup/GRCF_data_archive/NovaSeq6000/210914_A00814_0484_AHHKLFDSX2/Unaligned_1/Donlin-LS-11035_2021_09_14/1/C4_CD8_plus_CD57_plus_S75_L001_R1_001.fastq.gz
-    C5_PBMC: /gc-archive2/gc5-backup/GRCF_data_archive/NovaSeq6000/210914_A00814_0484_AHHKLFDSX2/Unaligned_1/Donlin-LS-11035_2021_09_14/20/C5_PBMC_without_CD8_plus_S94_L001_R1_001.fastq.gz
-    C5_CD8: /gc-archive2/gc5-backup/GRCF_data_archive/NovaSeq6000/210914_A00814_0484_AHHKLFDSX2/Unaligned_1/Donlin-LS-11035_2021_09_14/4/C5_CD8_plus_CD57_plus_S78_L001_R1_001.fastq.gz
-    C6_PBMC: /gc-archive2/gc5-backup/GRCF_data_archive/NovaSeq6000/210914_A00814_0484_AHHKLFDSX2/Unaligned_1/Donlin-LS-11035_2021_09_14/18/C6_PBMC_without_CD8_plus_S92_L001_R1_001.fastq.gz
-    C6_CD8: /gc-archive2/gc5-backup/GRCF_data_archive/NovaSeq6000/210914_A00814_0484_AHHKLFDSX2/Unaligned_1/Donlin-LS-11035_2021_09_14/2/C6_CD8_plus_CD57_plus_S76_L001_R1_001.fastq.gz
-    C7_PBMC: /gc-archive2/gc5-backup/GRCF_data_archive/NovaSeq6000/210914_A00814_0484_AHHKLFDSX2/Unaligned_1/Donlin-LS-11035_2021_09_14/21/C7_PBMC_without_CD8_plus_S95_L001_R1_001.fastq.gz
-    C7_CD8: /gc-archive2/gc5-backup/GRCF_data_archive/NovaSeq6000/210914_A00814_0484_AHHKLFDSX2/Unaligned_1/Donlin-LS-11035_2021_09_14/5/C7_CD8_plus_CD57_plus_S79_L001_R1_001.fastq.gz
-    C8_PBMC: /gc-archive2/gc5-backup/GRCF_data_archive/NovaSeq6000/210914_A00814_0484_AHHKLFDSX2/Unaligned_1/Donlin-LS-11035_2021_09_14/29/C8_CD8_plus_CD57_plus_S103_L001_R1_001.fastq.gz
-    C8_CD8: /gc-archive2/gc5-backup/GRCF_data_archive/NovaSeq6000/210914_A00814_0484_AHHKLFDSX2/Unaligned_1/Donlin-LS-11035_2021_09_14/13/C8_CD8_plus_CD57_plus_S87_L001_R1_001.fastq.gz
-    M27-2_PBMC: /gc-archive2/gc5-backup/GRCF_data_archive/NovaSeq6000/210914_A00814_0484_AHHKLFDSX2/Unaligned_1/Donlin-LS-11035_2021_09_14/30/M27-2_PBMC_without_CD8_plus_S104_L001_R1_001.fastq.gz
-    M27-2_CD8: /gc-archive2/gc5-backup/GRCF_data_archive/NovaSeq6000/210914_A00814_0484_AHHKLFDSX2/Unaligned_1/Donlin-LS-11035_2021_09_14/14/M27-2_CD8_plus_CD57_plus_S88_L001_R1_001.fastq.gz
-    M37-2_PBMC: /gc-archive2/gc5-backup/GRCF_data_archive/NovaSeq6000/210914_A00814_0484_AHHKLFDSX2/Unaligned_1/Donlin-LS-11035_2021_09_14/22/M37-2_PBMC_without_CD8_plus_S96_L001_R1_001.fastq.gz
-    M37-2_CD8: /gc-archive2/gc5-backup/GRCF_data_archive/NovaSeq6000/210914_A00814_0484_AHHKLFDSX2/Unaligned_1/Donlin-LS-11035_2021_09_14/6/M37-2_CD8_plus_CD57_plus_S80_L001_R1_001.fastq.gz
-    M39-2_PBMC: /gc-archive2/gc5-backup/GRCF_data_archive/NovaSeq6000/210914_A00814_0484_AHHKLFDSX2/Unaligned_1/Donlin-LS-11035_2021_09_14/23/M39-2_PBMC_without_CD8_plus_S97_L001_R1_001.fastq.gz
-    M39-2_CD8: /gc-archive2/gc5-backup/GRCF_data_archive/NovaSeq6000/210914_A00814_0484_AHHKLFDSX2/Unaligned_1/Donlin-LS-11035_2021_09_14/7/M39-2_CD8_plus_CD57_plus_S81_L001_R1_001.fastq.gz
-    M40-2_PBMC: /gc-archive2/gc5-backup/GRCF_data_archive/NovaSeq6000/210914_A00814_0484_AHHKLFDSX2/Unaligned_1/Donlin-LS-11035_2021_09_14/26/M40-2_PBMC_without_CD8_plus_S100_L001_R1_001.fastq.gz
-    M40-2_CD8: /gc-archive2/gc5-backup/GRCF_data_archive/NovaSeq6000/210914_A00814_0484_AHHKLFDSX2/Unaligned_1/Donlin-LS-11035_2021_09_14/10/M40-2_CD8_plus_CD57_plus_S84_L001_R1_001.fastq.gz
-    M46_PBMC: /gc-archive2/gc5-backup/GRCF_data_archive/NovaSeq6000/210914_A00814_0484_AHHKLFDSX2/Unaligned_1/Donlin-LS-11035_2021_09_14/27/M46_PBMC_without_CD8_plus_S101_L001_R1_001.fastq.gz
-    M46_CD8: /gc-archive2/gc5-backup/GRCF_data_archive/NovaSeq6000/210914_A00814_0484_AHHKLFDSX2/Unaligned_1/Donlin-LS-11035_2021_09_14/11/M46_CD8_plus_CD57_plus_S85_L001_R1_001.fastq.gz
-    M49-2_PBMC: /gc-archive2/gc5-backup/GRCF_data_archive/NovaSeq6000/210914_A00814_0484_AHHKLFDSX2/Unaligned_1/Donlin-LS-11035_2021_09_14/19/M49-2_PBMC_without_CD8_plus_S93_L001_R1_001.fastq.gz
-    M49-2_CD8: /gc-archive2/gc5-backup/GRCF_data_archive/NovaSeq6000/210914_A00814_0484_AHHKLFDSX2/Unaligned_1/Donlin-LS-11035_2021_09_14/3/M49-2_CD8_plus_CD57_plus_S77_L001_R1_001.fastq.gz
-    M52_PBMC: /gc-archive2/gc5-backup/GRCF_data_archive/NovaSeq6000/210914_A00814_0484_AHHKLFDSX2/Unaligned_1/Donlin-LS-11035_2021_09_14/28/M52_PBMC_without_CD8_plus_S102_L001_R1_001.fastq.gz
-    M52_CD8: /gc-archive2/gc5-backup/GRCF_data_archive/NovaSeq6000/210914_A00814_0484_AHHKLFDSX2/Unaligned_1/Donlin-LS-11035_2021_09_14/12/M52_CD8_plus_CD57_plus_S86_L001_R1_001.fastq.gz
-    M61-1_PBMC: /gc-archive2/gc5-backup/GRCF_data_archive/NovaSeq6000/210914_A00814_0484_AHHKLFDSX2/Unaligned_1/Donlin-LS-11035_2021_09_14/31/M61-1_PBMC_without_CD8_plus_S105_L001_R1_001.fastq.gz
-    M61-1_CD8_1: /gc-archive2/gc5-backup/GRCF_data_archive/NovaSeq6000/210914_A00814_0484_AHHKLFDSX2/Unaligned_1/Donlin-LS-11035_2021_09_14/33/M61-1_CD8_plus_CD57-_S107_L001_R1_001.fastq.gz
-    M61-1_CD8_2: /gc-archive2/gc5-backup/GRCF_data_archive/NovaSeq6000/210914_A00814_0484_AHHKLFDSX2/Unaligned_1/Donlin-LS-11035_2021_09_14/15/M61-1_CD8_plus_CD57_plus_S89_L001_R1_001.fastq.gz
-    M61_Muscle_PBMC: /gc-archive2/gc5-backup/GRCF_data_archive/NovaSeq6000/210914_A00814_0484_AHHKLFDSX2/Unaligned_1/Donlin-LS-11035_2021_09_14/32/M61_Muscle_PBMC_without_CD8_plus_S106_L001_R1_001.fastq.gz
-    M61_Muscle_CD8: /gc-archive2/gc5-backup/GRCF_data_archive/NovaSeq6000/210914_A00814_0484_AHHKLFDSX2/Unaligned_1/Donlin-LS-11035_2021_09_14/16/M61_Muscle_CD8_plus_S90_L001_R1_001.fastq.gz
-    M102_PBMC: /gc-archive2/gc5-backup/GRCF_data_archive/NovaSeq6000/210914_A00814_0484_AHHKLFDSX2/Unaligned_1/Donlin-LS-11035_2021_09_14/24/M102_PBMC_without_CD8_plus_S98_L001_R1_001.fastq.gz
-    M102_CD8: /gc-archive2/gc5-backup/GRCF_data_archive/NovaSeq6000/210914_A00814_0484_AHHKLFDSX2/Unaligned_1/Donlin-LS-11035_2021_09_14/8/M102_CD8_plus_CD57_plus_S82_L001_R1_001.fastq.gz
-    M109_PBMC: /gc-archive2/gc5-backup/GRCF_data_archive/NovaSeq6000/210914_A00814_0484_AHHKLFDSX2/Unaligned_1/Donlin-LS-11035_2021_09_14/25/M109_PBMC_without_CD8_plus_S99_L001_R1_001.fastq.gz
-    M109_CD8: /gc-archive2/gc5-backup/GRCF_data_archive/NovaSeq6000/210914_A00814_0484_AHHKLFDSX2/Unaligned_1/Donlin-LS-11035_2021_09_14/9/M109_CD8_plus_CD57_plus_S83_L001_R1_001.fastq.gz
+    JS1: /data/gc-core/taz2008/Pipelines/DNAseq/GRCF_WES/data/fastq/JS1_WES_S1_L000_R1_001.fastq.gz
+    JS2: /data/gc-core/taz2008/Pipelines/DNAseq/GRCF_WES/data/fastq/JS2_WES_S2_L000_R1_001.fastq.gz
+    JS3: /data/gc-core/taz2008/Pipelines/DNAseq/GRCF_WES/data/fastq/JS3_WES_S3_L000_R1_001.fastq.gz
 read2:
-    C4_PBMC: /gc-archive2/gc5-backup/GRCF_data_archive/NovaSeq6000/210914_A00814_0484_AHHKLFDSX2/Unaligned_1/Donlin-LS-11035_2021_09_14/17/C4_PBMC_without_CD8_plus_S91_L001_R2_001.fastq.gz
-    C4_CD8: /gc-archive2/gc5-backup/GRCF_data_archive/NovaSeq6000/210914_A00814_0484_AHHKLFDSX2/Unaligned_1/Donlin-LS-11035_2021_09_14/1/C4_CD8_plus_CD57_plus_S75_L001_R2_001.fastq.gz
-    C5_PBMC: /gc-archive2/gc5-backup/GRCF_data_archive/NovaSeq6000/210914_A00814_0484_AHHKLFDSX2/Unaligned_1/Donlin-LS-11035_2021_09_14/20/C5_PBMC_without_CD8_plus_S94_L001_R2_001.fastq.gz
-    C5_CD8: /gc-archive2/gc5-backup/GRCF_data_archive/NovaSeq6000/210914_A00814_0484_AHHKLFDSX2/Unaligned_1/Donlin-LS-11035_2021_09_14/4/C5_CD8_plus_CD57_plus_S78_L001_R2_001.fastq.gz
-    C6_PBMC: /gc-archive2/gc5-backup/GRCF_data_archive/NovaSeq6000/210914_A00814_0484_AHHKLFDSX2/Unaligned_1/Donlin-LS-11035_2021_09_14/18/C6_PBMC_without_CD8_plus_S92_L001_R2_001.fastq.gz
-    C6_CD8: /gc-archive2/gc5-backup/GRCF_data_archive/NovaSeq6000/210914_A00814_0484_AHHKLFDSX2/Unaligned_1/Donlin-LS-11035_2021_09_14/2/C6_CD8_plus_CD57_plus_S76_L001_R2_001.fastq.gz
-    C7_PBMC: /gc-archive2/gc5-backup/GRCF_data_archive/NovaSeq6000/210914_A00814_0484_AHHKLFDSX2/Unaligned_1/Donlin-LS-11035_2021_09_14/21/C7_PBMC_without_CD8_plus_S95_L001_R2_001.fastq.gz
-    C7_CD8: /gc-archive2/gc5-backup/GRCF_data_archive/NovaSeq6000/210914_A00814_0484_AHHKLFDSX2/Unaligned_1/Donlin-LS-11035_2021_09_14/5/C7_CD8_plus_CD57_plus_S79_L001_R2_001.fastq.gz
-    C8_PBMC: /gc-archive2/gc5-backup/GRCF_data_archive/NovaSeq6000/210914_A00814_0484_AHHKLFDSX2/Unaligned_1/Donlin-LS-11035_2021_09_14/29/C8_CD8_plus_CD57_plus_S103_L001_R2_001.fastq.gz
-    C8_CD8: /gc-archive2/gc5-backup/GRCF_data_archive/NovaSeq6000/210914_A00814_0484_AHHKLFDSX2/Unaligned_1/Donlin-LS-11035_2021_09_14/13/C8_CD8_plus_CD57_plus_S87_L001_R2_001.fastq.gz
-    M27-2_PBMC: /gc-archive2/gc5-backup/GRCF_data_archive/NovaSeq6000/210914_A00814_0484_AHHKLFDSX2/Unaligned_1/Donlin-LS-11035_2021_09_14/30/M27-2_PBMC_without_CD8_plus_S104_L001_R2_001.fastq.gz
-    M27-2_CD8: /gc-archive2/gc5-backup/GRCF_data_archive/NovaSeq6000/210914_A00814_0484_AHHKLFDSX2/Unaligned_1/Donlin-LS-11035_2021_09_14/14/M27-2_CD8_plus_CD57_plus_S88_L001_R2_001.fastq.gz
-    M37-2_PBMC: /gc-archive2/gc5-backup/GRCF_data_archive/NovaSeq6000/210914_A00814_0484_AHHKLFDSX2/Unaligned_1/Donlin-LS-11035_2021_09_14/22/M37-2_PBMC_without_CD8_plus_S96_L001_R2_001.fastq.gz
-    M37-2_CD8: /gc-archive2/gc5-backup/GRCF_data_archive/NovaSeq6000/210914_A00814_0484_AHHKLFDSX2/Unaligned_1/Donlin-LS-11035_2021_09_14/6/M37-2_CD8_plus_CD57_plus_S80_L001_R2_001.fastq.gz
-    M39-2_PBMC: /gc-archive2/gc5-backup/GRCF_data_archive/NovaSeq6000/210914_A00814_0484_AHHKLFDSX2/Unaligned_1/Donlin-LS-11035_2021_09_14/23/M39-2_PBMC_without_CD8_plus_S97_L001_R2_001.fastq.gz
-    M39-2_CD8: /gc-archive2/gc5-backup/GRCF_data_archive/NovaSeq6000/210914_A00814_0484_AHHKLFDSX2/Unaligned_1/Donlin-LS-11035_2021_09_14/7/M39-2_CD8_plus_CD57_plus_S81_L001_R2_001.fastq.gz
-    M40-2_PBMC: /gc-archive2/gc5-backup/GRCF_data_archive/NovaSeq6000/210914_A00814_0484_AHHKLFDSX2/Unaligned_1/Donlin-LS-11035_2021_09_14/26/M40-2_PBMC_without_CD8_plus_S100_L001_R2_001.fastq.gz
-    M40-2_CD8: /gc-archive2/gc5-backup/GRCF_data_archive/NovaSeq6000/210914_A00814_0484_AHHKLFDSX2/Unaligned_1/Donlin-LS-11035_2021_09_14/10/M40-2_CD8_plus_CD57_plus_S84_L001_R2_001.fastq.gz
-    M46_PBMC: /gc-archive2/gc5-backup/GRCF_data_archive/NovaSeq6000/210914_A00814_0484_AHHKLFDSX2/Unaligned_1/Donlin-LS-11035_2021_09_14/27/M46_PBMC_without_CD8_plus_S101_L001_R2_001.fastq.gz
-    M46_CD8: /gc-archive2/gc5-backup/GRCF_data_archive/NovaSeq6000/210914_A00814_0484_AHHKLFDSX2/Unaligned_1/Donlin-LS-11035_2021_09_14/11/M46_CD8_plus_CD57_plus_S85_L001_R2_001.fastq.gz
-    M49-2_PBMC: /gc-archive2/gc5-backup/GRCF_data_archive/NovaSeq6000/210914_A00814_0484_AHHKLFDSX2/Unaligned_1/Donlin-LS-11035_2021_09_14/19/M49-2_PBMC_without_CD8_plus_S93_L001_R2_001.fastq.gz
-    M49-2_CD8: /gc-archive2/gc5-backup/GRCF_data_archive/NovaSeq6000/210914_A00814_0484_AHHKLFDSX2/Unaligned_1/Donlin-LS-11035_2021_09_14/3/M49-2_CD8_plus_CD57_plus_S77_L001_R2_001.fastq.gz
-    M52_PBMC: /gc-archive2/gc5-backup/GRCF_data_archive/NovaSeq6000/210914_A00814_0484_AHHKLFDSX2/Unaligned_1/Donlin-LS-11035_2021_09_14/28/M52_PBMC_without_CD8_plus_S102_L001_R2_001.fastq.gz
-    M52_CD8: /gc-archive2/gc5-backup/GRCF_data_archive/NovaSeq6000/210914_A00814_0484_AHHKLFDSX2/Unaligned_1/Donlin-LS-11035_2021_09_14/12/M52_CD8_plus_CD57_plus_S86_L001_R2_001.fastq.gz
-    M61-1_PBMC: /gc-archive2/gc5-backup/GRCF_data_archive/NovaSeq6000/210914_A00814_0484_AHHKLFDSX2/Unaligned_1/Donlin-LS-11035_2021_09_14/31/M61-1_PBMC_without_CD8_plus_S105_L001_R2_001.fastq.gz
-    M61-1_CD8_1: /gc-archive2/gc5-backup/GRCF_data_archive/NovaSeq6000/210914_A00814_0484_AHHKLFDSX2/Unaligned_1/Donlin-LS-11035_2021_09_14/33/M61-1_CD8_plus_CD57-_S107_L001_R2_001.fastq.gz
-    M61-1_CD8_2: /gc-archive2/gc5-backup/GRCF_data_archive/NovaSeq6000/210914_A00814_0484_AHHKLFDSX2/Unaligned_1/Donlin-LS-11035_2021_09_14/15/M61-1_CD8_plus_CD57_plus_S89_L001_R2_001.fastq.gz
-    M61_Muscle_PBMC: /gc-archive2/gc5-backup/GRCF_data_archive/NovaSeq6000/210914_A00814_0484_AHHKLFDSX2/Unaligned_1/Donlin-LS-11035_2021_09_14/32/M61_Muscle_PBMC_without_CD8_plus_S106_L001_R2_001.fastq.gz
-    M61_Muscle_CD8: /gc-archive2/gc5-backup/GRCF_data_archive/NovaSeq6000/210914_A00814_0484_AHHKLFDSX2/Unaligned_1/Donlin-LS-11035_2021_09_14/16/M61_Muscle_CD8_plus_S90_L001_R2_001.fastq.gz
-    M102_PBMC: /gc-archive2/gc5-backup/GRCF_data_archive/NovaSeq6000/210914_A00814_0484_AHHKLFDSX2/Unaligned_1/Donlin-LS-11035_2021_09_14/24/M102_PBMC_without_CD8_plus_S98_L001_R2_001.fastq.gz
-    M102_CD8: /gc-archive2/gc5-backup/GRCF_data_archive/NovaSeq6000/210914_A00814_0484_AHHKLFDSX2/Unaligned_1/Donlin-LS-11035_2021_09_14/8/M102_CD8_plus_CD57_plus_S82_L001_R2_001.fastq.gz
-    M109_PBMC: /gc-archive2/gc5-backup/GRCF_data_archive/NovaSeq6000/210914_A00814_0484_AHHKLFDSX2/Unaligned_1/Donlin-LS-11035_2021_09_14/25/M109_PBMC_without_CD8_plus_S99_L001_R2_001.fastq.gz
-    M109_CD8: /gc-archive2/gc5-backup/GRCF_data_archive/NovaSeq6000/210914_A00814_0484_AHHKLFDSX2/Unaligned_1/Donlin-LS-11035_2021_09_14/9/M109_CD8_plus_CD57_plus_S83_L001_R2_001.fastq.gz
+    JS1: /data/gc-core/taz2008/Pipelines/DNAseq/GRCF_WES/data/fastq/JS1_WES_S1_L000_R2_001.fastq.gz
+    JS2: /data/gc-core/taz2008/Pipelines/DNAseq/GRCF_WES/data/fastq/JS2_WES_S2_L000_R2_001.fastq.gz
+    JS3: /data/gc-core/taz2008/Pipelines/DNAseq/GRCF_WES/data/fastq/JS3_WES_S3_L000_R2_001.fastq.gz
 
 # project name (use to nameoutput folder)
-project: 'Donlin-LS-11035_210914'
+project: 'Formenti-JS-12991_220927'
 
 # tumor-normal pairing information
 pair:
-    C4: ['C4_PBMC','C4_CD8']
-    C5: ['C5_PBMC','C5_CD8']
-    C6: ['C6_PBMC','C6_CD8']
-    C7: ['C7_PBMC','C7_CD8']
-    C8: ['C8_PBMC','C8_CD8']
-    M27: ['M27-2_PBMC','M27-2_CD8']
-    M37: ['M37-2_PBMC','M37-2_CD8']
-    M39: ['M39-2_PBMC','M39-2_CD8']
-    M40: ['M40-2_PBMC','M40-2_CD8']
-    M46: ['M46_PBMC','M46_CD8']
-    M49: ['M49-2_PBMC','M49-2_CD8']
-    M52: ['M52_PBMC','M52_CD8']
-    M61_1: ['M61-1_PBMC','M61-1_CD8_1']
-    M61_2: ['M61-1_PBMC','M61-1_CD8_2']
-    M61_Muscle: ['M61_Muscle_PBMC','M61_Muscle_CD8']
-    M102: ['M102_PBMC','M102_CD8']
-    M109: ['M109_PBMC','M109_CD8']
+    JS: ['JS2','JS1']
+    Origin: ['JS2','JS3']
 
 # normal samples
-##normal: ['C4_PBMC','C5_PBMC','C6_PBMC','C7_PBMC','C8_PBMC','M27-2_PBMC','M37-2_PBMC','M39-2_PBMC','M40-2_PBMC','M46_PBMC','M49-2_PBMC','M52_PBMC','M61-1_PBMC','M61_Muscle_PBMC','M102_PBMC','M109_PBMC']
-normal: ['C4_PBMC','C5_PBMC','C6_PBMC','C7_PBMC','C8_PBMC']
+normal: ['JS2']
 
 # target bed file
-#bed: source/bed/S07604514_Covered.GRCh38.bed
-bed: source/bed/S07604514_Covered.bed
+bed: source/bed/EXaCT-2/hg38/exact2.target.liftover.bed
 #bed: source/bed/test.bed
+cleanbed: source/bed/EXaCT-2/hg38/exact2.target.liftover.cleaned.bed
 
 # cutadapt parameters
 overlap: 3
@@ -136,16 +60,23 @@ exac: /data/gc-core/yit2001/Refs/Homo_sapiens/UCSC/hg38/resource/small_exac_comm
 funco: /data/gc-core/yit2001/Refs/Homo_sapiens/UCSC/hg38/resource/funcotator_dataSources.v1.7.20200521s/
 
 # MAF remove filtered variants?
-#mafilt: True
-mafilt: False
+mafilt: True
+#mafilt: False
 
 # MAF columns to write
 cols: ['Hugo_Symbol','Entrez_Gene_Id','Center','NCBI_Build','Chromosome','Start_Position','End_Position','Strand','Variant_Classification','Variant_Type','Reference_Allele','Tumor_Seq_Allele1','Tumor_Seq_Allele2','AS_FilterStatus','dbSNP_RS','dbSNP_Val_Status','Tumor_Sample_Barcode','Matched_Norm_Sample_Barcode','Genome_Change','Annotation_Transcript','Transcript_Strand','Transcript_Exon','Transcript_Position','cDNA_Change','Codon_Change','Protein_Change','Other_Transcripts','Refseq_mRNA_Id','Refseq_prot_Id','SwissProt_acc_Id','SwissProt_entry_Id','Description','GO_Biological_Process','GO_Cellular_Component','GO_Molecular_Function','COSMIC_overlapping_mutations','COSMIC_fusion_genes','COSMIC_tissue_types_affected','COSMIC_total_alterations_in_gene','DrugBank','ref_context','gc_content','tumor_f','t_alt_count','t_ref_count','n_alt_count','n_ref_count']
 
+# MAF rename columns if needed
+newcols: []
+
+# MAF freeze panes
+mrow: 1
+mcol: 14
+
 # per-base coverage report
 # %>?X
 covstart: 0
-covend: 100
+covend: 150
 covstep: 10
 # cutoff for low-coverage
 lowcut: 10
