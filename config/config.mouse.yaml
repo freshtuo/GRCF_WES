@@ -1,0 +1,87 @@
+# input fastq files
+read1:
+    WT: /gc7-data/NovaSeq6000/230123_A00814_0716_AHHVHCDSX5/Unaligned_11/Chen-XD-13618_2023_01_23/WT_S1_L003_R1_001.fastq.gz
+    KC: /gc7-data/NovaSeq6000/230123_A00814_0716_AHHVHCDSX5/Unaligned_11/Chen-XD-13618_2023_01_23/KC_S2_L003_R1_001.fastq.gz
+    KPC: /gc7-data/NovaSeq6000/230123_A00814_0716_AHHVHCDSX5/Unaligned_11/Chen-XD-13618_2023_01_23/KPC_S3_L003_R1_001.fastq.gz
+    KSC: /gc7-data/NovaSeq6000/230123_A00814_0716_AHHVHCDSX5/Unaligned_11/Chen-XD-13618_2023_01_23/KSC_S4_L003_R1_001.fastq.gz
+    KPSC: /gc7-data/NovaSeq6000/230123_A00814_0716_AHHVHCDSX5/Unaligned_11/Chen-XD-13618_2023_01_23/KPSC_S5_L003_R1_001.fastq.gz
+read2:
+    WT: /gc7-data/NovaSeq6000/230123_A00814_0716_AHHVHCDSX5/Unaligned_11/Chen-XD-13618_2023_01_23/WT_S1_L003_R2_001.fastq.gz
+    KC: /gc7-data/NovaSeq6000/230123_A00814_0716_AHHVHCDSX5/Unaligned_11/Chen-XD-13618_2023_01_23/KC_S2_L003_R2_001.fastq.gz
+    KPC: /gc7-data/NovaSeq6000/230123_A00814_0716_AHHVHCDSX5/Unaligned_11/Chen-XD-13618_2023_01_23/KPC_S3_L003_R2_001.fastq.gz
+    KSC: /gc7-data/NovaSeq6000/230123_A00814_0716_AHHVHCDSX5/Unaligned_11/Chen-XD-13618_2023_01_23/KSC_S4_L003_R2_001.fastq.gz
+    KPSC: /gc7-data/NovaSeq6000/230123_A00814_0716_AHHVHCDSX5/Unaligned_11/Chen-XD-13618_2023_01_23/KPSC_S5_L003_R2_001.fastq.gz
+
+# project name (use to nameoutput folder)
+project: 'Chen-XD-13618_230123'
+
+# tumor-normal pairing information
+pair:
+    KC: ['WT','KC']
+    KPC: ['WT','KPC']
+    KSC: ['WT','KSC']
+    KPSC: ['WT','KPSC']
+
+# normal samples
+normal: ['WT']
+
+# target bed file
+bed: source/bed/SureSelect_Mouse_All_Exon_V1/mm10/S0276129_Covered.liftover.GRCm38.bed
+#bed: source/bed/test.bed
+cleanbed: source/bed/SureSelect_Mouse_All_Exon_V1/mm10/S0276129_Covered.liftover.cleaned.GRCm38.bed
+
+# cutadapt parameters
+overlap: 3
+errate: 0.1
+minlen: 50
+qscore: 10
+adapter3: AGATCGGAAGAGCACACGTCTGAACTCCAGTCA
+adapter5: AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT
+
+# BWA parameters
+bwaidx: /data/gc-core/database/Refs/Mus_musculus/Ensembl/GRCm38/Sequence/BWAIndex/version0.7.17/GRCm38
+
+# Picard parameters
+refdict: /data/gc-core/database/Refs/Mus_musculus/Ensembl/GRCm38/Sequence/WholeGenomeFasta/genome.dict
+
+# genome assembly
+refver: mm10
+
+# GATK
+# dbsnp
+snpdb: /data/gc-core/database/Refs/Mus_musculus/Ensembl/GRCm38/Annotation/GATK/Mus_musculus.clean.sorted.vcf.gz
+##indeldb: /data/gc-core/database/Refs/Mus_musculus/Ensembl/GRCm38/Annotation/GATK/mgp.v3.indels.rsIDdbSNPv137.vcf.gz
+
+refseq: /data/gc-core/database/Refs/Mus_musculus/Ensembl/GRCm38/Sequence/WholeGenomeFasta/genome.fa
+
+# funcotator data sources path
+funco: /data/gc-core/database/funcotator/mouse/
+
+# MAF remove filtered variants?
+mafilt: True
+#mafilt: False
+
+# MAF columns to write
+cols: ['Gencode_M25_hugoSymbol','Center','Gencode_M25_ncbiBuild','Gencode_M25_chromosome','Gencode_M25_start','Gencode_M25_start','Strand','Gencode_M25_variantClassification','Gencode_M25_variantType','Gencode_M25_refAllele','Gencode_M25_tumorSeqAllele1','Gencode_M25_tumorSeqAllele2','AS_FilterStatus','dbSNP_ID','dbSNP_RS_VALIDATED','Tumor_Sample_Barcode','Matched_Norm_Sample_Barcode','Gencode_M25_genomeChange','Gencode_M25_annotationTranscript','Gencode_M25_transcriptStrand','Gencode_M25_transcriptExon','Gencode_M25_transcriptPos','Gencode_M25_cDnaChange','Gencode_M25_codonChange','Gencode_M25_proteinChange','Gencode_M25_otherTranscripts','tumor_f','t_alt_count','t_ref_count','n_alt_count','n_ref_count']
+
+# MAF rename columns if needed
+#newcols: []
+newcols: ['Hugo_Symbol','Center','NCBI_Build','Chromosome','Start_Position','End_Position','Strand','Variant_Classification','Variant_Type','Reference_Allele','Tumor_Seq_Allele1','Tumor_Seq_Allele2','AS_FilterStatus','dbSNP_RS','dbSNP_Val_Status','Tumor_Sample_Barcode','Matched_Norm_Sample_Barcode','Genome_Change','Annotation_Transcript','Transcript_Strand','Transcript_Exon','Transcript_Position','cDNA_Change','Codon_Change','Protein_Change','Other_Transcripts','tumor_f','t_alt_count','t_ref_count','n_alt_count','n_ref_count']
+
+# MAF freeze panes
+mrow: 1
+mcol: 13
+
+# per-base coverage report
+# %>?X
+covstart: 0
+covend: 150
+covstep: 10
+# cutoff for low-coverage
+lowcut: 10
+
+# target enrichment
+# plot size (cm)
+plotwidth: 40
+plotheight: 20
+
