@@ -1,4 +1,4 @@
-configfile: "config/config.yaml"
+configfile: "config/config.human.yaml"
 
 project=config["project"]
 
@@ -49,12 +49,12 @@ rule all:
         recal=expand("results/{project}/base_quality_recalibration/{sample}.markdup.recal.bam", project=config["project"], sample=config["read1"]),
         rawvcf=expand("results/{project}/mutect_variant_calling/{pair}/{pair}.raw.vcf.gz", project=config["project"], pair=config["pair"]),
         filtvcf=expand("results/{project}/filter_mutect_calls/{pair}/{pair}.filtered.vcf.gz", project=config["project"], pair=config["pair"]),
-        #nvcf=expand("results/{project}/mutect_variant_calling_normal/{normal}/{normal}.vcf.gz", project=config["project"], normal=config["normal"]),
-        #db=directory(expand("results/{project}/create_genomicsdb_normal/pon_db", project=config["project"])),
+        ####nvcf=expand("results/{project}/mutect_variant_calling_normal/{normal}/{normal}.vcf.gz", project=config["project"], normal=config["normal"]),
+        ####db=directory(expand("results/{project}/create_genomicsdb_normal/pon_db", project=config["project"])),
         funco=expand("results/{project}/funcotator_annotate_variants/{pair}/{pair}.funcotated.vcf.gz", project=config["project"], pair=config["pair"]),
         pon=expand("results/{project}/create_panel_of_normals/pon.vcf.gz", project=config["project"]),
-        #enrich=expand("results/{project}/review_target_enrichment/{sample}/enrichment.{sample}.txt", project=config["project"], sample=config["read1"])
-        #enrich=expand("results/{project}/review_target_enrichment/C4_PBMC/enrichment.C4_PBMC.txt", project=config["project"])
+        ####enrich=expand("results/{project}/review_target_enrichment/{sample}/enrichment.{sample}.txt", project=config["project"], sample=config["read1"])
+        ####enrich=expand("results/{project}/review_target_enrichment/C4_PBMC/enrichment.C4_PBMC.txt", project=config["project"])
         enrich=expand("results/{project}/review_target_enrichment/target_enrichment.png", project=config["project"]),
         report=expand("results/{project}/mafs_to_excel/variants.xlsx", project=config["project"]),
         covsum=expand("results/{project}/review_base_coverage/base.coverage.sumamry.xlsx", project=config["project"]),
@@ -206,7 +206,7 @@ rule base_coverage:
     output:
         cov="results/{project}/base_coverage/base_coverage.txt.gz"
     params:
-        bed=config["bed"]
+        bed=config["cleanbed"]
     resources:
         tmpdir=get_base_coverage_tempdir
     log:
@@ -260,7 +260,7 @@ rule review_target_enrichment:
         txt="results/{project}/review_target_enrichment/target_enrichment.txt",
         plot="results/{project}/review_target_enrichment/target_enrichment.png"
     params:
-        bed=config["bed"],
+        bed=config["cleanbed"],
         pw=config["plotwidth"],
         ph=config["plotheight"]
     resources:
@@ -282,7 +282,8 @@ rule base_quality_recalibration:
     output:
         tmp=temp(directory("results/{project}/base_quality_recalibration/tmp{sample}")),
         recal="results/{project}/base_quality_recalibration/{sample}.recal_data.table",
-        bam="results/{project}/base_quality_recalibration/{sample}.markdup.recal.bam"
+        bam="results/{project}/base_quality_recalibration/{sample}.markdup.recal.bam",
+        bai="results/{project}/base_quality_recalibration/{sample}.markdup.recal.bai"
     params:
         refseq=config["refseq"],
         snpdb=config["snpdb"]
@@ -311,7 +312,7 @@ rule mutect_variant_calling:
     params:
         refseq=config["refseq"],
         gnomad=config["gnomad"],
-        bed=config["bed"]
+        bed=config["cleanbed"]
     resources:
         mem_mb=16000
     threads: 8
@@ -428,7 +429,7 @@ rule mutect_variant_calling_normal:
         vcf="results/{project}/mutect_variant_calling_normal/{normal}/{normal}.vcf.gz"
     params:
         refseq=config["refseq"],
-        bed=config["bed"]
+        bed=config["cleanbed"]
     resources:
         mem_mb=16000
     threads: 4
@@ -451,7 +452,7 @@ rule create_genomicsdb_normal:
         db=temp(directory("results/{project}/create_genomicsdb_normal/pon_db"))
     params:
         refseq=config["refseq"],
-        bed=config["bed"],
+        bed=config["cleanbed"],
         vcf=get_normal_vcfs
     resources:
         mem_mb=12000
@@ -552,7 +553,7 @@ rule cnvkit_copy_number_calling:
         scatter="results/{project}/cnvkit_copy_number_calling/{pair}/{pair}-scatter.png"
     params:
         refseq=config["refseq"],
-        bed=config["bed"]
+        bed=config["cleanbed"]
     resources:
         mem_mb=16000
     threads: 4
@@ -564,10 +565,9 @@ rule cnvkit_copy_number_calling:
         """touch {input.normalbai}; """
         """touch {input.tumorbai}; """
         """refseq=`basename {params.refseq}`; """
-        """cd {output.folder}; """
-        """ln {params.refseq} ${{refseq}}; """
-        """ln {params.refseq}.fai ${{refseq}}.fai; """
-        """touch ${{refseq}}.fai; """
+        """cp {params.refseq} {output.folder}/; """
+        """cp {params.refseq}.fai {output.folder}/; """
+        """touch {output.folder}/${{refseq}}.fai; """
         """cnvkit.py batch {input.tumorbam} """
         """--normal {input.normalbam} """
         """--targets {params.bed} """
@@ -579,10 +579,10 @@ rule cnvkit_copy_number_calling:
         """>{log} 2>&1; """
         """x=`basename {input.tumorbam}`; """
         """tid=${{x%.markdup.recal.bam}}; """
-        """mv ${{tid}}.markdup.call.cns {output.call}; """
-        """mv ${{tid}}.markdup.cnr {output.cnr}; """
-        """mv ${{tid}}.markdup.cns {output.cns}; """
-        """mv ${{tid}}.markdup-diagram.pdf {output.diagram}; """
-        """mv ${{tid}}.markdup-scatter.png {output.scatter}; """
+        """mv {output.folder}/${{tid}}.markdup.call.cns {output.call}; """
+        """mv {output.folder}/${{tid}}.markdup.cnr {output.cnr}; """
+        """mv {output.folder}/${{tid}}.markdup.cns {output.cns}; """
+        """mv {output.folder}/${{tid}}.markdup-diagram.pdf {output.diagram}; """
+        """mv {output.folder}/${{tid}}.markdup-scatter.png {output.scatter}; """
         """rm {output.folder}/${{refseq}}*; """
 
