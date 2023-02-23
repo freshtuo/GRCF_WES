@@ -72,6 +72,10 @@ newcols: ['Hugo_Symbol','Center','NCBI_Build','Chromosome','Start_Position','End
 mrow: 1
 mcol: 13
 
+# CNV remove regions without cnvs?
+cnvfilt: True
+#cnvfilt: False
+
 # per-base coverage report
 # %>?X
 covstart: 0

@@ -56,9 +56,11 @@ rule all:
         ####enrich=expand("results/{project}/review_target_enrichment/{sample}/enrichment.{sample}.txt", project=config["project"], sample=config["read1"])
         ####enrich=expand("results/{project}/review_target_enrichment/C4_PBMC/enrichment.C4_PBMC.txt", project=config["project"])
         enrich=expand("results/{project}/review_target_enrichment/target_enrichment.png", project=config["project"]),
-        report=expand("results/{project}/mafs_to_excel/variants.xlsx", project=config["project"]),
+        varsum=expand("results/{project}/mafs_to_excel/variants.xlsx", project=config["project"]),
         covsum=expand("results/{project}/review_base_coverage/base.coverage.sumamry.xlsx", project=config["project"]),
-        cnvcall=expand("results/{project}/cnvkit_copy_number_calling/{pair}/{pair}.call.cns", project=config["project"], pair=config["pair"])
+        cnvcall=expand("results/{project}/cnvkit_copy_number_calling/{pair}/{pair}.call.cns", project=config["project"], pair=config["pair"]),
+        cnvann=expand("results/{project}/annotate_copy_number_variations/{pair}/{pair}.call.annotated.txt.gz", project=config["project"], pair=config["pair"]),
+        cnvsum=expand("results/{project}/cnvs_to_excel/cnvs.xlsx", project=config["project"])
 
 rule rename_fastq:
     input:
@@ -535,4 +537,35 @@ rule cnvkit_copy_number_calling:
         """mv {output.folder}/${{tid}}.markdup-diagram.pdf {output.diagram}; """
         """mv {output.folder}/${{tid}}.markdup-scatter.png {output.scatter}; """
         """rm {output.folder}/${{refseq}}*; """
+
+# annotate copy number variations based on (annotated) target bed file with bedtools
+rule annotate_copy_number_variations:
+    input:
+        call="results/{project}/cnvkit_copy_number_calling/{pair}/{pair}.call.cns"
+    output:
+        tempbed=temp("results/{project}/annotate_copy_number_variations/{pair}/{pair}.tmp.bed"),
+        call="results/{project}/annotate_copy_number_variations/{pair}/{pair}.call.annotated.txt.gz"
+    params:
+        bed=config["bed"]
+    log:
+        "results/{project}/logs/annotate_copy_number_variations/annotate.{pair}.log"
+    conda:
+        "../envs/python.yaml"
+    script:
+        "../scripts/annotate_cnv.py"
+
+# Combine annotated CNVs and write to an excel file
+rule cnvs_to_excel:
+    input:
+        cnv=expand("results/{project}/annotate_copy_number_variations/{pair}/{pair}.call.annotated.txt.gz", project=config["project"], pair=config["pair"])
+    output:
+        report="results/{project}/cnvs_to_excel/cnvs.xlsx"
+    params:
+        filt=config["cnvfilt"]
+    log:
+        "results/{project}/logs/cnvs_to_excel/combine_cnvs.log"
+    conda:
+        "../envs/python.yaml"
+    script:
+        "../scripts/cnvs_to_excel.py"
 
